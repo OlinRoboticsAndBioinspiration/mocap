@@ -7,7 +7,7 @@ import numpy as np
 LEFT_HANDED = 0
 RIGHT_HANDED = 1
 TSL = 11            #Trackable state vector length
-MSL = 3 #Marker state vector length
+MSL = 3             #Marker state vector length
 
 class Run():
     """Represents an experimental run as a collection of frames"""
@@ -191,5 +191,5 @@ class ERot():
         self.pitch = float(fields[1])
         self.roll = float(fields[2])
 
-    def toArray():
+    def toArray(self):
         return np.array([self.yaw, self.pitch, self.roll])
