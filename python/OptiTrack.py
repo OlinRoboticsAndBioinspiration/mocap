@@ -165,7 +165,7 @@ class Position():
         self.y = float(fields[1])
         self.z = float(fields[2])
 
-    def toArray():
+    def toArray(self):
         return np.array([self.x, self.y, self.z])
 
 class QRot():
@@ -178,7 +178,7 @@ class QRot():
         self.qz = float(fields[2])
         self.qw = float(fields[3])
 
-    def toArray():
+    def toArray(self):
         return np.array([self.qx, self.qy, self.qz, self.qw])
 
 class ERot():
