@@ -43,11 +43,20 @@ class Run():
         id = None
       if name in names:
         id = ids[names.index(name)]
-      assert not(id is None)
+      #TODO ensure it only works with some set of markers. Re add functionality of `assert not(id is None)`
+      if id == None:
+        trackable = Trackable()
+        trackable.name = name
+        trackable.id = len(self.trackables)+1
+        id = trackable.id
+        ids.append (id)
+        self.trackables.append(trackable)
 
       tr = self.trackables[ids.index(id)]
       N = self.framecount
-      M = tr.num_markers
+
+      #TODO make this not depend on the first frame
+      M = len(self.trackable_frames[0].ptcld_markers) #get the length from the first frame
 
       t = np.nan*np.zeros(N)
       d = np.nan*np.zeros((N,M,3))
@@ -56,7 +65,11 @@ class Run():
         if f.id == id:
           j = f.index
           t[j] = f.timestamp
-          d[j,:,:] = np.asarray([m.pos.toArray() for m in f.ptcld_markers])
+
+          data = np.asarray([m.pos.toArray() for m in f.ptcld_markers]);
+          #for now ignore all non perfect data
+          if data.shape[0] == M:
+            d[j,:,:] = np.asarray([m.pos.toArray() for m in f.ptcld_markers])
 
       return t,d
 
@@ -253,7 +266,11 @@ class Trackable():
         for i in range(self.num_markers):
             self.markers.append(Position(fields[idx:idx+MSL]))
             idx += MSL
-
+    def __init__(self):
+      self.name = None
+      self.id = None
+      self.num_markers = 0
+      self.markers = []
     def __repr__( self ):
       return "trk = {'id':%d,'name':%s,'m':%d}" % (self.id,self.name,self.num_markers)
 
