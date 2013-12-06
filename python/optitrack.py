@@ -252,8 +252,16 @@ class TrackableState():
 class Trackable():
     """Represents a trackable object"""
 
-    def __init__(self, fields):
+    def __init__(self, fields=None):
         """Constructor for a trackable object"""
+        self.name = None
+        self.id = None
+        self.num_markers = 0
+        self.markers = []
+        
+        if fields == None:
+			return;
+        
         if fields[0].lower() != "trackable":
             raise Exception("You attempted to make a trackable object from " +\
                             "data that does not represent a trackable.")
@@ -266,11 +274,7 @@ class Trackable():
         for i in range(self.num_markers):
             self.markers.append(Position(fields[idx:idx+MSL]))
             idx += MSL
-    def __init__(self):
-      self.name = None
-      self.id = None
-      self.num_markers = 0
-      self.markers = []
+
     def __repr__( self ):
       return "trk = {'id':%d,'name':%s,'m':%d}" % (self.id,self.name,self.num_markers)
 
