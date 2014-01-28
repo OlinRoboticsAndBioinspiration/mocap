@@ -2,6 +2,7 @@ import unittest
 import optitrack
 
 data_dir = "testData"
+
 class BackwardsCompatibilityV1(unittest.TestCase):
     def test(self):
         run = optitrack.Run()
@@ -53,5 +54,22 @@ class BackwardsCompatibilityV1_1(unittest.TestCase):
         self.assertEqual(d[100, 1, 0], 0.71552318)
         self.assertEqual(d[100, 1, 1], 10.0)
 
+class BackwardsCompatibilityV1Nat(unittest.TestCase):
+    def test(self):
+        run = optitrack.Run()
+        run.ReadFile(data_dir, "nat.csv") #Nat generated from natnethelper
+        self.assertEqual(run.version, 1.0)
+
+        self.assertEqual(run.trackablecount, 2)
+
+        #TODO order should not matter here
+        self.assertEqual(run.trackables[0].name, 'rbt')
+        self.assertEqual(run.trackables[0].num_markers, 5)
+
+        t, d = run.trk("rbt")
+        self.assertEqual(len(t), 105)
+        self.assertEqual(d.shape[0], 105)
+        self.assertEqual(d.shape[1], 5)
+        self.assertEqual(d.shape[2], 3)
 if __name__ == "__main__":
     unittest.main()
