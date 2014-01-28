@@ -45,7 +45,7 @@ class Run():
         id = ids[names.index(name)]
       #TODO ensure it only works with some set of markers. Re add functionality of `assert not(id is None)`
       if id == None:
-        trackable = Trackable()
+        trackable = Trackable(self.version)
         trackable.name = name
         trackable.id = len(self.trackables)+1
         id = trackable.id
@@ -56,7 +56,7 @@ class Run():
       N = self.framecount
 
       #TODO make this not depend on the first frame
-      M = len(self.trackable_frames[0].ptcld_markers) #get the length from the first frame
+      M = tr.num_markers
 
       t = np.nan*np.zeros(N)
       d = np.nan*np.zeros((N,M,3))
@@ -118,6 +118,7 @@ class Run():
         self.fi  = filename
         filename = os.path.join(data_dir, filename)
         fp = csv.reader(open(filename, "rU"))
+        self.version = 1.0 #set default version
         try:
           while ( 1 ):
               if len( self.frames ) > N:
@@ -132,15 +133,17 @@ class Run():
                   if fields[0].lower() == "info":
                       if fields[1].lower() == "framecount":
                           self.framecount = int(fields[2])
-                      elif fields[1].lower() == "trackablecount":
+                      elif fields[1].lower() in ["trackablecount", "rigidbodycount"]:
                           self.trackablecount = int(fields[2])
                           if self.trackablecount > 0:
                               for i in range(self.trackablecount):
-                                  self.trackables.append(Trackable(fp.next()))
+                                  self.trackables.append(Trackable(self.version, fp.next()))
+                      elif fields[1].lower() == "version":
+                          self.version = float(fields[2])
                   elif fields[0].lower() == "frame":
-                      self.frames.append(Frame(fields))
-                  elif fields[0].lower() == "trackable":
-                      self.trackable_frames.append(TrackableFrame(fields))
+                      self.frames.append(Frame(self.version, fields))
+                  elif fields[0].lower() in ["trackable", "rigidbody"]:
+                      self.trackable_frames.append(TrackableFrame(self.version, fields))
         except StopIteration:
             pass
 
@@ -149,7 +152,7 @@ class Run():
 
 class Frame():
     """Represents one frame of motion capture data"""
-    def __init__(self, fields):
+    def __init__(self, version, fields):
         """Constructor for a frame object"""
         if fields[0].lower() != "frame":
             raise Exception("You attempted to make a frame from something " +\
@@ -162,17 +165,21 @@ class Frame():
         self.timestamp = float(fields[2])
         self.trackable_count = int(fields[3])
         idx = 4
+
         if self.trackable_count > 0:
             for i in range(self.trackable_count):
                 if not( bad in ''.join(fields[idx:idx+TSL]) ):
-                    self.trackable_states.append(TrackableState(fields[idx:idx+TSL]))
+                    self.trackable_states.append(TrackableState( fields[idx:idx+TSL]))
                 idx += TSL
         self.marker_count = int(fields[idx])
         idx += 1
+        stride = 4
+        if version == 1.1:
+          stride = 5
         for i in range(self.marker_count):
             if not( bad in ''.join(fields[idx:idx+MSL]) ):
                 self.markers.append(Marker(fields[idx+MSL], fields[idx:idx+MSL]))
-            idx += 4
+            idx += stride
     def __repr__( self ):
       return "frame = {'index':%s,'t':%f,'m':%d,'l':%d}" % (self.index,self.timestamp,len(self.markers),self.trackable_count)
 
@@ -180,7 +187,7 @@ class TrackableFrame():
     """Represents extended frame information for frames containing
     trackables."""
 
-    def __init__(self, fields):
+    def __init__(self, version, fields):
         """Constructor for a frame of extended trackable information"""
         self.markers = []
         self.ptcld_markers = []
@@ -252,7 +259,7 @@ class TrackableState():
 class Trackable():
     """Represents a trackable object"""
 
-    def __init__(self, fields=None):
+    def __init__(self, version, fields=None):
         """Constructor for a trackable object"""
         self.name = None
         self.id = None
@@ -262,7 +269,7 @@ class Trackable():
         if fields == None:
 			return;
         
-        if fields[0].lower() != "trackable":
+        if fields[0].lower() not in ["trackable", "rigidbody"]:
             raise Exception("You attempted to make a trackable object from " +\
                             "data that does not represent a trackable.")
 
