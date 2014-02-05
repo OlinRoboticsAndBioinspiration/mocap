@@ -86,15 +86,13 @@ class Run():
       if id == None:
         trackable = Trackable(self.version)
         trackable.name = name
-        trackable.id = len(self.trackables)+1
+        trackable.id = len(self.trackables)
         id = trackable.id
         ids.append (id)
         self.trackables.append(trackable)
 
       tr = self.trackables[ids.index(id)]
-      N = self.framecount
-
-      #TODO make this not depend on the first frame
+      N = self.framecount 
       M = tr.num_markers
 
       t = np.nan*np.zeros(N)
@@ -103,6 +101,8 @@ class Run():
       for f in self.trackable_frames:
         if f.id == id:
           j = f.index
+          if j >= N: #ignore weird data
+            continue
           t[j] = f.timestamp
 
           data = np.asarray([m.pos.toArray() for m in f.ptcld_markers]);
@@ -307,7 +307,6 @@ class Trackable():
         
         if fields == None:
 			return;
-        
         if fields[0].lower() not in ["trackable", "rigidbody"]:
             raise Exception("You attempted to make a trackable object from " +\
                             "data that does not represent a trackable.")
