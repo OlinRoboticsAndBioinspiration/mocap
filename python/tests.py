@@ -48,17 +48,17 @@ class BackwardsCompatibilityV1(unittest.TestCase):
         run.ReadFile(data_dir, "v1.csv")
         self.assertEqual(run.version, 1)
         self.assertEqual(len(run.frames), 1668)
-        self.assertEqual(run.trackablecount, 4)
+        self.assertEqual(run.rigidbodycount, 4)
 
         #TODO order should not matter here
-        self.assertEqual(run.trackables[0].name, 'r')
-        self.assertEqual(run.trackables[0].num_markers, 3)
-        self.assertEqual(run.trackables[1].name, 'l')
-        self.assertEqual(run.trackables[1].num_markers, 3)
-        self.assertEqual(run.trackables[2].name, 'slider')
-        self.assertEqual(run.trackables[2].num_markers, 6)
-        self.assertEqual(run.trackables[3].name, 'rbt')
-        self.assertEqual(run.trackables[3].num_markers, 5)
+        self.assertEqual(run.rigidbodies[0].name, 'r')
+        self.assertEqual(run.rigidbodies[0].num_markers, 3)
+        self.assertEqual(run.rigidbodies[1].name, 'l')
+        self.assertEqual(run.rigidbodies[1].num_markers, 3)
+        self.assertEqual(run.rigidbodies[2].name, 'slider')
+        self.assertEqual(run.rigidbodies[2].num_markers, 6)
+        self.assertEqual(run.rigidbodies[3].name, 'rbt')
+        self.assertEqual(run.rigidbodies[3].num_markers, 5)
         t, d = run.trk("rbt")
         self.assertEqual(len(t), 1668)
         self.assertEqual(d.shape[0], 1668)
@@ -77,11 +77,11 @@ class BackwardsCompatibilityV1_1(unittest.TestCase):
         self.assertEqual(run.version, 1.1)
 
         self.assertEqual(len(run.frames), 548)
-        self.assertEqual(run.trackablecount, 1)
+        self.assertEqual(run.rigidbodycount, 1)
 
         #TODO order should not matter here
-        self.assertEqual(run.trackables[0].name, 'Rigid Body 1')
-        self.assertEqual(run.trackables[0].num_markers, 5)
+        self.assertEqual(run.rigidbodies[0].name, 'Rigid Body 1')
+        self.assertEqual(run.rigidbodies[0].num_markers, 5)
 
         t, d = run.trk("Rigid Body 1")
         self.assertEqual(len(t), 548)
@@ -99,11 +99,11 @@ class BackwardsCompatibilityV1Nat(unittest.TestCase):
         run.ReadFile(data_dir, "nat.csv") #Nat generated from natnethelper
         self.assertEqual(run.version, 1.0)
 
-        self.assertEqual(run.trackablecount, 2)
+        self.assertEqual(run.rigidbodycount, 2)
 
         #TODO order should not matter here
-        self.assertEqual(run.trackables[0].name, 'rbt')
-        self.assertEqual(run.trackables[0].num_markers, 5)
+        self.assertEqual(run.rigidbodies[0].name, 'rbt')
+        self.assertEqual(run.rigidbodies[0].num_markers, 5)
 
         t, d = run.trk("rbt")
         self.assertEqual(len(t), 105)
